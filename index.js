@@ -1,7 +1,12 @@
+require('dotenv').config()
+
 const express = require('express')
 const app = express()
 const morgan = require('morgan')
 const cors = require('cors')
+
+const Note = require('./models/notes')
+
 
 app.use(express.static('dist'))
 
@@ -22,23 +27,6 @@ app.use(cors())
 app.use(express.json())
 app.use(requestLogger)
 
-let notes = [
-  {
-    id: 1,
-    content: "HTML is easy",
-    important: true
-  },
-  {
-    id: 2,
-    content: "Browser can execute only JavaScript",
-    important: false
-  },
-  {
-    id: 3,
-    content: "GET and POST are the most important methods of HTTP protocol",
-    important: true
-  }
-]
 
 
 app.get('/', (req, res) => {
@@ -46,7 +34,9 @@ app.get('/', (req, res) => {
 })
 
 app.get('/api/notes', (req, res) => {
-  res.json(notes)
+  Note.find({}).then(notes => {
+    res.json(notes)
+  })
 })
 
 const generateId = () => {
@@ -99,7 +89,7 @@ app.delete('/api/notes/:id', (request, response) => {
 
 app.use(unknownEndpoint)
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
